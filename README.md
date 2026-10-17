@@ -40,13 +40,17 @@ shopsphere_portfolio/
 ├── data/
 │   ├── ecommerce_orders.csv
 │   └── cleaned_ecommerce_orders.csv
-└── outputs/
-    ├── city_sales.csv
-    ├── customer_segments.csv
-    ├── monthly_sales.csv
-    ├── order_status.csv
-    ├── payment_methods.csv
-    └── product_sales.csv
+├── outputs/
+│   ├── city_sales.csv
+│   ├── customer_segments.csv
+│   ├── monthly_sales.csv
+│   ├── order_status.csv
+│   ├── payment_methods.csv
+│   └── product_sales.csv
+├── sql/
+│   └── sql_analysis.sql
+└── images/
+
 ```
 
 ## Run the Notebook
