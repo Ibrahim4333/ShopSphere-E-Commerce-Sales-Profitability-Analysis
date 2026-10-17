@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ShopSphere | E-commerce Intelligence</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#f3f6fb;--card:#fff;--ink:#142b4a;--mut:#5b6b82;--line:#dce5f0;--a:#2463a6;--b:#18a999;--c:#e9a23b;--r:#d9534f;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1726;--card:#15233a;--ink:#e8f0fa;--mut:#9fb1c8;--line:#26395a;--a:#5aa0e6;--b:#35c9b8;--c:#f0b45a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0d1726;--card:#15233a;--ink:#e8f0fa;--mut:#9fb1c8;--line:#26395a;--a:#5aa0e6;--b:#35c9b8;--c:#f0b45a;color-scheme:dark}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,"Segoe UI",system-ui,sans-serif}
+.w{max-width:1280px;margin:0 auto;padding:16px}
+.hero{background:linear-gradient(115deg,#142b4a,#205b83 60%,#2b8c9c);color:#fff;border-radius:18px;padding:24px 28px;margin-bottom:14px}
+.hero h1{margin:0;font-size:1.7rem}.hero p{margin:6px 0 0;color:#d9eaf6}
+.bar{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:12px 0}
+.bar label{font-size:.78rem;color:var(--mut);text-transform:uppercase;letter-spacing:.05em;margin-right:6px}
+.seg button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 14px;cursor:pointer;font-size:.88rem}
+.seg button:first-child{border-radius:9px 0 0 9px}.seg button:last-child{border-radius:0 9px 9px 0}
+.seg button.on{background:var(--a);color:#fff;border-color:var(--a)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.k,.c{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.k span{font-size:.76rem;color:var(--mut)}.k b{display:block;font-size:1.45rem;margin-top:4px}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px;margin-top:14px}
+.c h3{margin:0 0 4px;font-size:1rem}.c small{color:var(--mut)}
+.cv{position:relative;height:290px;margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:.86rem;margin-top:8px}
+th,td{padding:7px 6px;text-align:right;border-bottom:1px solid var(--line)}th:first-child,td:first-child{text-align:left}th{color:var(--mut);font-weight:600}
+.ins li{margin:8px 0;line-height:1.45}.note{background:var(--card);border-left:4px solid var(--c);border-radius:8px;padding:10px 14px;margin-top:14px;font-size:.84rem;color:var(--mut)}
+.wide{overflow-x:auto}
+</style></head><body><div class="w">
+<div class="hero"><h1>ShopSphere | E-commerce Intelligence</h1><p>Sales performance · Product profitability · Customer value · Geographic trends — 15,000 orders, 2,000 customers, 10 cities (synthetic 2025 data)</p></div>
+<div class="bar"><div><label>Category</label><span class="seg" id="cat"></span></div><div><label>Metric</label><span class="seg" id="met"></span></div></div>
+<div class="kpis" id="kpis"></div>
+<div class="g">
+<div class="c"><h3>Monthly trend</h3><small>All products · switch metric above</small><div class="cv"><canvas id="m"></canvas></div></div>
+<div class="c"><h3 id="pt">Products</h3><small>Responds to category and metric</small><div class="cv"><canvas id="p"></canvas></div></div>
+<div class="c"><h3>Cities</h3><small>All products · 10 known cities</small><div class="cv"><canvas id="ci"></canvas></div></div>
+<div class="c"><h3>Order status mix</h3><small>Share of orders</small><div class="cv"><canvas id="s"></canvas></div></div>
+</div>
+<div class="g">
+<div class="c wide"><h3>Customer segments</h3><table id="sg"></table></div>
+<div class="c wide"><h3>Discount level vs. margin</h3><table id="ds"></table></div>
+<div class="c"><h3>Key insights</h3><ul class="ins" style="padding-left:18px;margin:6px 0 0">
+<li><b>Profit is concentrated:</b> Laptops deliver 41.6% of profit; the top 3 products (Laptop, Smartphone, Tablet) deliver 74%.</li>
+<li><b>Margins are tight (26.9%–28.2%):</b> growth comes from volume and mix, not pricing gaps. Tablet is the one high-revenue, below-average-margin product.</li>
+<li><b>Seasonality:</b> March is the revenue peak (₹60.4M) and October the low (₹48.7M).</li>
+<li><b>Leakage risk:</b> 32.7% of orders are Cancelled or Returned. Investigate with fulfilment and refund data.</li>
+<li><b>Discounts:</b> margin stays ~27.3–27.6% at every discount level. This is descriptive only, not causal.</li></ul></div>
+</div>
+<div class="note">Data note: synthetic dataset. Revenue and profit are populated for all order statuses (including Cancelled and Returned), so totals are not verified net sales. Figures come from the cleaned dataset (14,980 rows after removing 50 duplicates and 20 invalid quantities); 50 orders with an unknown city are excluded from the city chart. Monthly profit is derived from each month's reported margin.</div>
+</div>
+<script>
+const P=[["Laptop","Electronics",269.0048,74.01399,1505,4590],["Smartphone","Electronics",118.2022,32.7679,1475,4396],["Tablet","Electronics",91.0092,24.96442,1522,4599],["Monitor","Electronics",59.26889,16.13922,1447,4390],["Printer","Office",47.18755,12.94038,1445,4366],["Smartwatch","Wearables",29.45356,8.01312,1549,4684],["Webcam","Accessories",14.11338,3.86013,1483,4497],["Headphones","Accessories",10.30774,2.8634,1503,4577],["Keyboard","Accessories",6.152383,1.69038,1508,4531],["Mouse","Accessories",3.274544,0.89556,1543,4538]];
+const MO=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const MR=[51.17,50.75,60.44,52.79,49.38,55.98,53.15,58.79,52.93,48.69,55.9,58.0],MM=[26.78,27.29,26.95,27.72,27.91,27.74,27.91,27.89,27.37,27.98,27.28,27.2],MN=[1244,1180,1299,1174,1228,1236,1235,1326,1239,1251,1252,1316];
+const CI=[["Hyderabad",69.679,19.056,1509],["Delhi",68.731,19.098,1505],["Chennai",64.352,17.589,1500],["Pune",64.322,17.739,1449],["Bangalore",63.598,17.231,1493],["Dehradun",63.483,17.387,1522],["Lucknow",63.273,17.862,1488],["Jaipur",63.262,17.409,1474],["Kolkata",62.773,17.359,1511],["Mumbai",61.963,16.699,1479]];
+const ST=[["Completed",10078],["Cancelled",2459],["Returned",2443]];
+const SG=[["Frequent (5+ orders)",1741,350269,96389],["Occasional (2–4)",252,148919,40357],["One-time",7,89829,23486]];
+const DS=[["0%",3002,140.69,27.53],["5%",2929,132.15,27.26],["10%",2988,132.12,27.53],["15%",3038,124.07,27.62],["20%",3023,118.94,27.52]];
+let cat="All",met="Revenue";const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const mi={Revenue:0,Profit:1,Orders:2};
+const fmt=(v,m)=>m==="Orders"?Math.round(v).toLocaleString("en-IN"):"₹"+v.toFixed(1)+"M";
+function seg(id,opts,get,set){const e=$(id);e.innerHTML="";opts.forEach(o=>{const b=document.createElement("button");b.textContent=o;b.className=get()===o?"on":"";b.onclick=()=>{set(o);render()};e.appendChild(b)})}
+const charts={};
+function mk(id,cfg){if(charts[id])charts[id].destroy();Chart.defaults.color=css("--mut");Chart.defaults.borderColor=css("--line");charts[id]=new Chart($(id),cfg)}
+const opt=(extra={})=>Object.assign({responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>" "+fmt(c.parsed.x??c.parsed.y,met)}}}},extra);
+function render(){
+ seg("cat",["All","Electronics","Office","Wearables","Accessories"],()=>cat,v=>cat=v);
+ seg("met",["Revenue","Profit","Orders"],()=>met,v=>met=v);
+ const pr=P.filter(p=>cat==="All"||p[1]===cat),rev=pr.reduce((a,p)=>a+p[2],0),pf=pr.reduce((a,p)=>a+p[3],0),od=pr.reduce((a,p)=>a+p[4],0),un=pr.reduce((a,p)=>a+p[5],0);
+ $("kpis").innerHTML=[["Revenue","₹"+rev.toFixed(1)+"M"],["Profit","₹"+pf.toFixed(1)+"M"],["Margin",(pf/rev*100).toFixed(2)+"%"],["Orders",od.toLocaleString("en-IN")],["Avg order value","₹"+Math.round(rev*1e6/od).toLocaleString("en-IN")],["Units sold",un.toLocaleString("en-IN")]].map(k=>`<div class="k"><span>${k[0]}</span><b>${k[1]}</b></div>`).join("");
+ const mv=met==="Revenue"?MR:met==="Orders"?MN:MR.map((r,i)=>+(r*MM[i]/100).toFixed(2));
+ mk("m",{type:"line",data:{labels:MO,datasets:[{data:mv,borderColor:css("--a"),backgroundColor:css("--a")+"33",fill:true,tension:.3,pointRadius:4}]},options:Object.assign(opt(),{scales:{y:{ticks:{callback:v=>met==="Orders"?v:"₹"+v+"M"}}}})});
+ $("pt").textContent=(cat==="All"?"All products":cat)+" · by "+met.toLowerCase();
+ const ps=[...pr].sort((a,b)=>b[2+mi[met]]-a[2+mi[met]]);
+ mk("p",{type:"bar",data:{labels:ps.map(p=>p[0]),datasets:[{data:ps.map(p=>p[2+mi[met]]),backgroundColor:ps.map(p=>({Electronics:css("--a"),Office:css("--c"),Wearables:css("--b"),Accessories:"#8a7ad6"})[p[1]])}]},options:Object.assign(opt(),{indexAxis:"y"})});
+ const cs=[...CI].sort((a,b)=>b[1+mi[met]]-a[1+mi[met]]);
+ mk("ci",{type:"bar",data:{labels:cs.map(c=>c[0]),datasets:[{data:cs.map(c=>c[1+mi[met]]),backgroundColor:css("--b")}]},options:Object.assign(opt(),{indexAxis:"y"})});
+ mk("s",{type:"doughnut",data:{labels:ST.map(s=>s[0]),datasets:[{data:ST.map(s=>s[1]),backgroundColor:[css("--a"),css("--r"),css("--c")],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:"62%",plugins:{legend:{position:"bottom"}}}});
+ $("sg").innerHTML="<tr><th>Segment</th><th>Customers</th><th>Revenue / cust.</th><th>Profit / cust.</th></tr>"+SG.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>₹${r[2].toLocaleString("en-IN")}</td><td>₹${r[3].toLocaleString("en-IN")}</td></tr>`).join("");
+ $("ds").innerHTML="<tr><th>Discount</th><th>Orders</th><th>Revenue</th><th>Margin</th></tr>"+DS.map(r=>`<tr><td>${r[0]}</td><td>${r[1].toLocaleString("en-IN")}</td><td>₹${r[2]}M</td><td>${r[3]}%</td></tr>`).join("");
+}
+render();
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",render);
+</script></body></html>
