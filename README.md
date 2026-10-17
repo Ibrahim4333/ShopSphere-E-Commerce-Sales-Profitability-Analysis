@@ -102,7 +102,6 @@ The dashboard opens in your browser. Use the sidebar to filter by date range, ci
 
 ## Future Improvements
 
-- Add a validated SQL analysis layer.
 - Build a Power BI version of the dashboard if Power BI is part of the intended portfolio.
 - Add tests for data-quality rules and financial reconciliation.
 - Use real order lifecycle and refund fields to calculate net sales more accurately.
