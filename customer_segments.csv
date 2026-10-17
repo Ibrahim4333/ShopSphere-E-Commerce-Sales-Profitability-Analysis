@@ -1,0 +1,4 @@
+CustomerSegment,Customers,Revenue,Profit,Orders,RevenueSharePct,RevenuePerCustomer,ProfitPerCustomer
+Frequent,1741,609817717.58,167814084.76,14093,94.11,350268.65,96389.48
+Occasional,252,37527710.55,10170012.15,880,5.79,148919.49,40357.19
+One-time,7,628800.87,164400.74,7,0.1,89828.7,23485.82
